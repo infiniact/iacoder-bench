@@ -1,3 +1,7 @@
+# bench
+
+> IACoder 评测相关信息：二进制、评测脚本、评测输出与评测排名。
+
 # IACoder Bench
 
 **IACoder**（INFINIACT 出品的 AI agent 引擎）的评测工具集：DeepSWE 与 Terminal-Bench 2.1 的适配器、启动/分析脚本、预编译二进制与结果工具。
@@ -11,7 +15,7 @@ bench/
 │   └── terminal-bench/   # Terminal-Bench (Harbor) 适配器: iacoder_tbench.Iacoder
 ├── bin/                  # 预编译二进制 (musl static, release)
 ├── scripts/              # 启动 / 聚合 / 指标脚本
-├── results/              # 评测快照与轨迹分析
+├── results/              # 评测结果（稍后发布）
 └── docs/                 # 文档
 ```
 
