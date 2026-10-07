@@ -1,0 +1,22 @@
+# iacoder 评测配置模板：deepseek-flash（DeepSeek 官方端点）。
+# 用法：IACODER_CONFIG=<本文件路径>；密钥只从环境变量 DEEPSEEK_API_KEY 读取，不要写进文件。
+# 适配器把 ${ENV:VAR} 引用的变量从宿主环境转发进容器（经单独文件下发、读取后删除，不进命令行）。
+#
+# 不要加 [settings] max_turns：评测规则不设步数上限，适配器默认 --max-turns=0（不限）。
+# 换用其他（中转）端点时，Pier 的 egress 白名单也要放行该域名，见 harness/README.md。
+
+[default_models]
+chat = "deepseek-flash"
+flash = "deepseek-flash"
+advisor = "deepseek-flash"
+
+[providers.deepseek]
+api_key = "${ENV:DEEPSEEK_API_KEY}"
+base_url = "https://api.deepseek.com/v1"
+
+[models.deepseek-flash]
+provider = "deepseek"
+model = "deepseek-flash"
+context_window = 1000000
+
+[settings]

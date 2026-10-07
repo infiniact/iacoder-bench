@@ -1,0 +1,2 @@
+7a9f42afac2b7d9fdc13e9c661cc113e9ff461c2180b8371ff14d6e5f29c1833  iacoder-aarch64-unknown-linux-musl.tar.gz
+019d16a21513ea1ccbe921c447d6fe728912f43c0bf25b836712fec07430ac2f  iacoder-x86_64-unknown-linux-musl.tar.gz

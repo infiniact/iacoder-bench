@@ -1,0 +1,38 @@
+{
+  "run_id": "deepswe-v0.7.64-deepseek-flash-20261007T000000Z",
+  "benchmark": "DeepSWE",
+  "rules": "deepswe",
+  "binary": {
+    "version": "v0.7.64",
+    "sha256": {
+      "iacoder-x86_64-unknown-linux-musl.tar.gz": "019d16a21513ea1ccbe921c447d6fe728912f43c0bf25b836712fec07430ac2f",
+      "iacoder-aarch64-unknown-linux-musl.tar.gz": "7a9f42afac2b7d9fdc13e9c661cc113e9ff461c2180b8371ff14d6e5f29c1833"
+    }
+  },
+  "harness": {
+    "repo": "infiniact/iacoder",
+    "tag": "v0.7.64",
+    "commit": "24228eac7ae08f11cccc0d6f24028c3bdcd39cdc",
+    "path": "harness/deep-swe",
+    "tree_sha256": "<sha256>"
+  },
+  "config": {"file": "deepseek-flash.toml", "sha256": "<sha256>"},
+  "model": "deepseek-flash",
+  "dataset": {
+    "name": "datacurve/deep-swe-1-1",
+    "source": "https://github.com/datacurve-ai/deep-swe",
+    "pinned_commit": "0b9fabbb63b9104d678fe965e1632f2dd9eaa2ea",
+    "tasks": 113
+  },
+  "trials_per_task": 4,
+  "timeout_multiplier": 1.0,
+  "concurrency": 16,
+  "agent_env": {"IACODER_PROMPT_TEMPLATE": "mini-swe-agent-custom", "IACODER_REASONING_EFFORT": "max"},
+  "outer_timeout_sec": "10800",
+  "runner": {"name": "pier", "version": "<pier --version>"},
+  "docker": "<docker server version>",
+  "host": {"os": "Linux", "kernel": "<uname -r>", "arch": "x86_64", "cpus": 64, "mem_total_gib": 121.0},
+  "command": "IACODER_BINARY_URL=<binary-url> IACODER_CONFIG=<bench>/configs/deepseek-flash.toml ... pier run -p <tasks-dir> --agent-import-path iacoder_pier:IacoderPierAgent --model deepseek-flash --n-tasks 113 --n-concurrent 16 --n-attempts 4 --timeout-multiplier 1.0 --max-retries 0 -o <jobs-dir>",
+  "started_at": "2026-10-07T00:00:00Z",
+  "finished_at": null
+}

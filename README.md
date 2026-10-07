@@ -1,91 +1,64 @@
 # bench
 
-> IACoder 评测相关信息：二进制、评测脚本、评测输出与评测排名。
+**IACoder**（INFINIACT 的 AI agent 引擎）在 DeepSWE 与 Terminal-Bench 上的评测仓库：
+二进制、评测适配器快照、计分代码、复现步骤与每轮运行档案。
 
-# IACoder Bench
+## 规则摘要
 
-**IACoder**（INFINIACT 出品的 AI agent 引擎）的评测工具集：DeepSWE 与 Terminal-Bench 2.1 的适配器、启动/分析脚本、预编译二进制与结果工具。
+完整规则、原文与来源见 [RULES.md](RULES.md)（抓取日期 2026-10-07）。
 
-## 目录结构
+| | DeepSWE | Terminal-Bench 4.0 |
+|---|---|---|
+| 题数 | 113（数据集 commit `0b9fabbb`） | 66，全覆盖，不接受子集 |
+| 每题次数 | 4 | ≥ 5 |
+| 时限 | 以 `task.toml` 为准，倍率 1.0，不覆盖；无步数 / 费用上限 | 统一 8 小时，倍率 1.0，不覆盖超时与资源 |
+| 主指标 | pass@1 宏平均 ± 1.96·SE（按轮）、pass@4 | accuracy（pooled）± 1.96·SE（按题公式） |
+| 出错的 trial | 服务商 / 判分 / 瞬态网络错误剔除，不重采样；超时、上下文耗尽计失败 | 一律记 0，不剔除 |
+| 提交 | 联系 Datacurve | 社区提交目前关闭 |
 
-```
-bench/
-├── adapters/
-│   ├── deep-swe/         # DeepSWE (Pier) 适配器: iacoder_pier.IacoderPierAgent
-│   └── terminal-bench/   # Terminal-Bench (Harbor) 适配器: iacoder_tbench.Iacoder
-├── bin/                  # 预编译二进制 (musl static, release)
-├── scripts/              # 启动 / 聚合 / 指标脚本
-├── results/              # 评测结果（稍后发布）
-└── docs/                 # 文档
-```
+本仓库附加规定：所有评测关闭网页工具（`--no-web`）；只发布严格合规的结果；不拼接、不取优、不重采样。
+
+## 已发布结果
+
+**目前没有符合规则的已发布结果。** 准入条件见 [results/README.md](results/README.md)。
+
+> 撤回说明（2026-10-05）：此前列出的 DeepSWE「97/117 = 82.9%」已撤下——它由多轮重跑累计得出，不是 pass@1，
+> 且运行时开启了网页搜索。详见 [docs/withdrawn-2026-10-05.md](docs/withdrawn-2026-10-05.md)。
 
 ## 快速开始
 
-### Terminal-Bench 2.1（Harbor）
-
 ```bash
-# 适配器依赖 iacoder_harbor_base（位于 iacoder 仓库 eval/common）
-export PYTHONPATH=/opt/iacoder/eval/terminal-bench:/opt/iacoder/eval/common
-export IACODER_DEV_BINARY_URL=http://<host>:8765/iacoder-x86_64-unknown-linux-musl.tar.gz
-
-harbor run -d terminal-bench/terminal-bench-2-1 \
-           --agent iacoder_tbench:Iacoder \
-           -m glm-5.3 -k 5 -n 2 \
-           --ae IACODER_DANGEROUSLY_ALLOW_ALL=true \
-           --no-teardown
+./bench preflight --benchmark deepswe --version v0.7.64 --model deepseek-flash --concurrency 16 --tasks-dir <tasks-dir>
+./bench run       --benchmark deepswe --version v0.7.64 --model deepseek-flash --concurrency 16 --tasks-dir <tasks-dir>
+./bench status <run-id> --watch 60
+./bench score  <run-id> --leaderboard-row
 ```
 
-### DeepSWE（Pier）
+Terminal-Bench 4.0 把 `--benchmark deepswe … --tasks-dir <tasks-dir>` 换成 `--benchmark tbench`。
+准备工作（主机、密钥、二进制 URL、镜像）与完整流程见 [docs/quickstart.md](docs/quickstart.md)。
 
-```bash
-export PYTHONPATH=/opt/iacoder/eval/deep-swe:/opt/iacoder/eval/common
-export IACODER_BINARY_URL=http://<host>:8765/iacoder-x86_64-unknown-linux-musl.tar.gz
+## 目录
 
-# 官方 113 题；每题 4 次 rollout；超时以 task.toml 为准（倍率 1.0）
-pier run -p <eval-root>/tasks \
-         --agent-import-path iacoder_pier:IacoderPierAgent \
-         --model glm-5.3 -k 4 --timeout-multiplier 1.0 \
-         --n-concurrent 2 --force-build
+```
+bench/
+├── bench, bench.py  # 统一入口：preflight / run / status / score
+├── RULES.md         # 评测组织规则 + 本仓库附加规定 + 变更记录
+├── bin/<version>/   # iacoder 预编译二进制（官方 release，带 SHA256SUMS）
+├── harness/         # iacoder 评测适配器快照（iacoder@v0.7.64，iacoder 源码不公开）
+├── configs/         # 无密钥的 iacoder 评测配置模板
+├── scoring/         # 唯一计分入口 score.py + usage.py + leaderboard_row.py + 单测
+├── runs/            # 每轮运行档案（manifest / score / report）
+├── results/         # 只放合规的对外结果
+├── reproduce/       # 复现环境的通用步骤与工具（镜像缓存、版本锁）
+├── tools/           # 通用分析工具（内部诊断，不进公开成绩）
+├── tests/           # bench 的单测
+└── docs/            # 快速开始、方法论、撤回记录
 ```
 
-## 关键说明
+## 测试
 
-- **模型**：GLM-5.3（智谱 Coding 端点 `api/coding/paas/v4`）
-- **网页工具**：评测一律关闭（`--no-web`），agent 不做任何网络搜索
-- **全自动批准**：`IACODER_DANGEROUSLY_ALLOW_ALL=true`（任务沙箱内危险命令直接放行）
-- **二进制**：musl 静态 release 构建，来自 infiniact/iacoder 官方发布
-- **断点续跑**：Harbor `--resume <job-dir>` + `--no-teardown`；只续跑未完成的 trial，绝不重跑已完成的 trial 去替换成绩
-- **失败归因**：`agent/iacoder.txt` 即标准 trajectory（含 done site / turns / usage）
-
-## 评测规则（遵循评测组织的官方规定）
-
-### DeepSWE（Datacurve）
-
-- 框架为 Pier；每题约 4 次 rollout；指标 pass@1 为各题通过比例（通过次数 / 计分 rollout 数）的宏平均。
-- 单次 rollout 的时限以官方 `task.toml` 为准（当前为 10800 秒），超时倍率 1.0；不设步数或费用上限。
-- rollout 在提交补丁、耗尽模型原生上下文或超时时结束；后两种情况计为失败。
-- 只有模型服务错误、判分错误、瞬态网络错误可以排除，排除时同时从分子和分母剔除，且不重新采样。
-- 不得拼接多次重跑的结果，也不得取多次中的最好一次。
-- 提交方式：联系 Datacurve，由对方添加结果。
-- 来源：[DeepSWE 论文 §5](https://arxiv.org/html/2607.07946v1)、[Run DeepSWE](https://deepswe.datacurve.ai/run)
-
-### Terminal-Bench 2.x（Harbor）
-
-- 每题至少 5 次试验（`-k 5`）；`timeout_multiplier` 必须为 1.0；不得覆盖 agent 或 verifier 超时，不得覆盖 CPU、内存、存储资源。
-- 每个 trial 须有有效的 `result.json` 和运行产物；提交完整 job 目录和 `metadata.yaml`。
-- agent 不得访问 Terminal-Bench 网站或其 GitHub 仓库。
-- 现状：2.0 社区提交暂停，等待新流程；2.1 目前只收录维护者运行的结果。
-- 来源：[Terminal-Bench 2.0 leaderboard](https://huggingface.co/datasets/harborframework/terminal-bench-2-leaderboard)、[Terminal-Bench 2.1](https://github.com/harbor-framework/terminal-bench-2-1)
-
-### 本仓库的附加规定
-
-- 所有评测关闭网页工具。
-- 只发布严格按上述规则产出的结果，并保留可复查的原始 job 目录。
-
-## 评测结果
-
-目前没有符合上述规则的已发布结果。
-
-> **撤回说明（2026-10-05）**：此前此处列出的 DeepSWE「97/117 = 82.9%」已撤下。该数字由多轮重跑累计得出，不是 pass@1；运行时还开启了网页搜索。两点都不符合评测组织的规则。
+```bash
+python3 -m unittest discover -s scoring/tests && python3 -m unittest discover -s tests
+```
 
 © 2026 INFINIACT CO., LTD.  Agent engine: IACoder

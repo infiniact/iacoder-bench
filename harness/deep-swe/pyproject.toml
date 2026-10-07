@@ -1,0 +1,30 @@
+[project]
+name = "iacoder-pier"
+version = "0.1.0"
+description = "Pier agent adapter for iacoder on DeepSWE"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+authors = [{ name = "iacoder contributors" }]
+dependencies = [
+  # Shared base — owns the install template, gate texts and run pattern.
+  # ADR 0043; the gate text itself is single-sourced there per ADR-0235.
+  "iacoder-harbor-base",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["iacoder_pier"]
+
+[tool.uv.sources]
+iacoder-harbor-base = { path = "../common", editable = true }
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

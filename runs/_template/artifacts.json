@@ -1,0 +1,7 @@
+{
+  "job_archive": "<archive>/<run-id>.tar.zst",
+  "sha256": "<sha256 of the archive>",
+  "bytes": 0,
+  "packed_at": "<UTC ISO time>",
+  "contents": "完整 job 目录：每个 trial 的 result.json、agent/（session.jsonl、iacoder.txt）、verifier/、artifacts/"
+}

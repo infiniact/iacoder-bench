@@ -1,0 +1,174 @@
+#!/bin/bash
+#
+# Harbor renders this template (Jinja2) and copies it into each task container
+# as the install step before agent execution. See docs/architecture/eval-terminal-bench.md.
+#
+# Required preconditions inside the container: Debian/Ubuntu base, root or sudo.
+# This script must NOT assume curl/git/etc. are pre-installed.
+#
+# Template variables (provided by Harbor or our agent class):
+#   iacoder_version   GitHub Release tag, default "latest"
+#   iacoder_repo      "<owner>/<repo>" slug, default "datiexu/iacoder"
+
+# Note: set -e is intentionally NOT used at the top level because Harbor may
+# close stdout early (e.g. when trial is cancelled), causing SIGPIPE. We handle
+# errors explicitly where they matter.
+set -u
+
+# ---------------------------------------------------------------------------
+# 1. Workaround for Harbor `upload_dir` /tests double-nesting bug.
+#    If the task agent later creates /tests/, docker cp will mount the
+#    verifier as /tests/tests/, breaking pytest. Pre-creating /tests forces
+#    docker cp's "target exists" branch -> contents merge into /tests/ ✓.
+#    See tech-debt: "Harbor `upload_dir` /tests 覆盖 bug".
+# ---------------------------------------------------------------------------
+mkdir -p /tests
+
+# ---------------------------------------------------------------------------
+# 2. Minimal system deps. Most terminal-bench task images already ship these
+#    but we don't get to assume.
+#
+#    Pre-step: swap deb.debian.org -> Tsinghua mirror over plain HTTP. From
+#    inside colima on a China network the default repo loses large index
+#    files mid-transfer (small InRelease succeeds, 8.7MB Packages gets
+#    Ign'd repeatedly), and the install step exits 100 -> setup-timeout.
+#    HTTPS to Tsinghua fails until ca-certificates is installed, so use
+#    plain HTTP here; package signatures are still verified.
+# ---------------------------------------------------------------------------
+if [ -f /etc/apt/sources.list.d/debian.sources ]; then
+    sed -i \
+        -e 's|http://deb.debian.org/debian-security|http://mirrors.tuna.tsinghua.edu.cn/debian-security|g' \
+        -e 's|http://deb.debian.org/debian|http://mirrors.tuna.tsinghua.edu.cn/debian|g' \
+        /etc/apt/sources.list.d/debian.sources
+fi
+if [ -f /etc/apt/sources.list ]; then
+    sed -i \
+        -e 's|http://deb.debian.org/debian-security|http://mirrors.tuna.tsinghua.edu.cn/debian-security|g' \
+        -e 's|http://deb.debian.org/debian|http://mirrors.tuna.tsinghua.edu.cn/debian|g' \
+        -e 's|http://archive.ubuntu.com/ubuntu|http://mirrors.tuna.tsinghua.edu.cn/ubuntu|g' \
+        -e 's|http://security.ubuntu.com/ubuntu|http://mirrors.tuna.tsinghua.edu.cn/ubuntu|g' \
+        /etc/apt/sources.list
+fi
+export DEBIAN_FRONTEND=noninteractive
+apt-get update -y
+apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    tar \
+    git
+
+# ---------------------------------------------------------------------------
+# 2b. PyPI mirror for `uv` / `pip`.
+#     Many terminal-bench verifiers (`tests/test.sh`) install python deps
+#     via `uvx pytest ...` or `pip install`. On a China network the
+#     default pypi.org index times out mid-fetch and the verifier exits
+#     with `error: Failed to fetch: https://pypi.org/simple/<pkg>/`,
+#     reward.txt = 0 even when iacoder solved the task. uv reads
+#     `/etc/uv/uv.toml` system-wide; pip reads `/etc/pip.conf`. Set
+#     both so legacy + modern installers both go through the mirror.
+#     Mirrors `Tsinghua TUNA` to stay symmetric with the apt setup above.
+# ---------------------------------------------------------------------------
+mkdir -p /etc/uv
+cat > /etc/uv/uv.toml <<'EOF'
+[[index]]
+name = "tsinghua"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+default = true
+EOF
+
+cat > /etc/pip.conf <<'EOF'
+[global]
+index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+trusted-host = pypi.tuna.tsinghua.edu.cn
+EOF
+
+# ---------------------------------------------------------------------------
+# 3. Install iacoder binary.
+#    Two paths:
+#
+#    (a) **Dev mode (M-eval.1)** — `iacoder_binary_url` template variable
+#        is rendered (set via the `IACODER_DEV_BINARY_URL` env on the host
+#        side; `agent.py` plumbs it through). This pulls a tar.gz from a
+#        local HTTP server (e.g. `python3 -m http.server`) and skips the
+#        GitHub Releases path entirely. The smoke runner script in
+#        `scripts/run-smoke.sh` uses this.
+#
+#    (b) **Release mode (M-eval.2+)** — pulls the static musl binary from
+#        GitHub Releases by ${IACODER_VERSION} + uname-derived target.
+#        Requires the CI release pipeline to be in place; until it is,
+#        this branch will 404 and the run surfaces a real error rather
+#        than a silent skip. See tech-debt: "iacoder Linux musl 二进制
+#        release 缺失".
+# ---------------------------------------------------------------------------
+IACODER_BINARY_URL="{{ iacoder_binary_url | default('') }}"
+IACODER_VERSION="{{ iacoder_version | default('latest') }}"
+IACODER_REPO="{{ iacoder_repo | default('datiexu/iacoder') }}"
+
+ARCH="$(uname -m)"
+case "$ARCH" in
+    x86_64)  TARGET="x86_64-unknown-linux-musl" ;;
+    aarch64) TARGET="aarch64-unknown-linux-musl" ;;
+    *)
+        echo "iacoder: unsupported architecture: $ARCH" >&2
+        exit 1
+        ;;
+esac
+
+if [ -n "$IACODER_BINARY_URL" ]; then
+    URL="$IACODER_BINARY_URL"
+    echo "iacoder: using dev-mode binary URL ($URL)"
+elif [ "$IACODER_VERSION" = "latest" ]; then
+    URL="https://github.com/${IACODER_REPO}/releases/latest/download/iacoder-${TARGET}.tar.gz"
+else
+    URL="https://github.com/${IACODER_REPO}/releases/download/${IACODER_VERSION}/iacoder-${TARGET}.tar.gz"
+fi
+
+echo "iacoder: downloading $URL"
+curl -fsSL --retry 3 --retry-delay 2 "$URL" -o /tmp/iacoder.tar.gz
+
+# Detect tarball format: new format has bin/ and config/ directories
+# (via `run-tbench.sh` pack_dev_binary), old format has just the binary.
+FORMAT=$(tar -tzf /tmp/iacoder.tar.gz 2>/dev/null | head -1 | cut -d'/' -f1)
+if [ "$FORMAT" = "bin" ]; then
+    # New format: contains bin/ and config/ directories
+    echo "iacoder: extracting new format tarball"
+    tar -xzf /tmp/iacoder.tar.gz -C /usr/local/bin --strip-components=1 bin/iacoder
+    chmod +x /usr/local/bin/iacoder
+else
+    # Old format: just the binary (or GitHub Releases)
+    echo "iacoder: extracting old format tarball"
+    tar -xzf /tmp/iacoder.tar.gz -C /usr/local/bin
+    chmod +x /usr/local/bin/iacoder
+fi
+rm -f /tmp/iacoder.tar.gz
+
+# ---------------------------------------------------------------------------
+# 4. Provision config.toml — a verbatim copy of the host's iacoder config
+#    (base64-embedded by agent.py). iacoder resolves its config dir as
+#    ``$XDG_CONFIG_HOME/iacoder``; agent.py sets XDG_CONFIG_HOME to this dir at
+#    run time, so the path works regardless of which user runs the agent.
+#    Private until install() assigns ownership to the actual agent UID/GID.
+# ---------------------------------------------------------------------------
+IACODER_CONFIG_B64="{{ iacoder_config_b64 | default('') }}"
+IACODER_CONFIG_XDG="{{ iacoder_config_xdg | default('/iacoder-cfg') }}"
+umask 077
+mkdir -p "${IACODER_CONFIG_XDG}/iacoder"
+chmod 700 "${IACODER_CONFIG_XDG}" "${IACODER_CONFIG_XDG}/iacoder"
+if [ -n "$IACODER_CONFIG_B64" ]; then
+    printf '%s' "$IACODER_CONFIG_B64" | base64 -d > "${IACODER_CONFIG_XDG}/iacoder/config.toml"
+    chmod 600 "${IACODER_CONFIG_XDG}/iacoder/config.toml"
+    echo "iacoder: provisioned config.toml from host -> ${IACODER_CONFIG_XDG}/iacoder/config.toml"
+else
+    echo "iacoder: WARNING no host config.toml provided; iacoder will rely on its own defaults" >&2
+fi
+
+# ---------------------------------------------------------------------------
+# 5. Health check. Failing here surfaces as install error.
+# ---------------------------------------------------------------------------
+if iacoder --version >/dev/null 2>&1; then
+    echo "iacoder: install OK"
+else
+    echo "iacoder: health check failed" >&2
+    iacoder --version 2>&1 || true
+    exit 1
+fi

@@ -1,0 +1,36 @@
+[project]
+name = "iacoder-tbench"
+version = "0.2.0"
+description = "Harbor agent adapter for iacoder on terminal-bench 2.0"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+authors = [{ name = "iacoder contributors" }]
+dependencies = [
+  # Shared base — owns the install template + run pattern.
+  # See ADR 0043.
+  "iacoder-harbor-base",
+  # Same Harbor pin as the base; declared here so this package is
+  # installable standalone (uv resolves to the same version).
+  "harbor>=0.5,<1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8",
+  "ruff>=0.5",
+]
+
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["iacoder_tbench"]
+
+[tool.uv.sources]
+iacoder-harbor-base = { path = "../common", editable = true }
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

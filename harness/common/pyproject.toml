@@ -1,0 +1,35 @@
+[project]
+name = "iacoder-harbor-base"
+version = "0.1.0"
+description = "Shared BaseInstalledAgent for iacoder Harbor adapters (ADR 0043)"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+authors = [{ name = "iacoder contributors" }]
+dependencies = [
+  # Pinned in sync with every per-bench adapter. A bump should land in
+  # one PR covering all six packages (base + 5 adapters) and re-running
+  # smoke on each.
+  "harbor>=0.5,<1.0",
+  # Used to render `install-iacoder.sh.j2` host-side before
+  # `exec_as_root`. Harbor ships jinja2 transitively, but we declare it
+  # directly so the base's deps don't ride on Harbor's transitive set.
+  "jinja2>=3.1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8",
+  "ruff>=0.5",
+]
+
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["iacoder_harbor_base"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

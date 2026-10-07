@@ -1,0 +1,20 @@
+# iacoder 评测配置模板：glm-5.3（智谱 Coding 端点）。
+# 用法：IACODER_CONFIG=<本文件路径>；密钥只从环境变量 GLM_API_KEY 读取，不要写进文件。
+#
+# 不要加 [settings] max_turns：评测规则不设步数上限，适配器默认 --max-turns=0（不限）。
+# context_window 未填写，由 iacoder 按模型解析；如需固定，按智谱官方文档填写并在该轮 manifest 中记录。
+
+[default_models]
+chat = "glm-5.3"
+flash = "glm-5.3"
+advisor = "glm-5.3"
+
+[providers.zhipu_coding]
+api_key = "${ENV:GLM_API_KEY}"
+base_url = "https://open.bigmodel.cn/api/coding/paas/v4"
+
+[models.glm-5.3]
+provider = "zhipu_coding"
+model = "glm-5.3"
+
+[settings]

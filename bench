@@ -1,0 +1,3 @@
+#!/bin/sh
+# bench 统一入口：一键检查、启动、监控、计分。详见 ./bench --help 与 docs/quickstart.md。
+exec python3 "$(dirname -- "$0")/bench.py" "$@"

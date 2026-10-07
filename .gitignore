@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# bench 本地运行产物（runs/<id>/ 下只提交 manifest.json、score.json、report.md、artifacts.json）
+/jobs/
+runs/*/launch.sh
+runs/*/local.json
+runs/*/pid

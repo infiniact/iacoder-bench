@@ -1,0 +1,7 @@
+# glm-5.3 单价：TODO。
+# 智谱官方价格以人民币计、且 Coding 套餐按包月计费，没有按 token 的公开美元价。
+# 填写前先到官方价格页核实，并写明来源 URL 与抓取日期；未填写时 usage.py 不输出成本。
+
+model = "glm-5.3"
+source = "TODO"
+fetched = "TODO"

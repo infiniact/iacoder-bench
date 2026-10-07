@@ -1,0 +1,29 @@
+# deepseek-flash 单价，美元 / 百万 token。
+# 来源：DeepSeek 官方价格页 https://api-docs.deepseek.com/quick_start/pricing （抓取日期 2026-10-07）
+# 官方原文："Peak hours are 01:00 - 04:00 and 06:00 - 10:00 UTC, Monday through Friday,
+#           excluding Chinese public holidays. All other hours are off-peak, including weekends
+#           and Chinese public holidays in full." / "Off-peak rates are half of the peak rates."
+# 价格变动时以官方为准，改这里并在 PR 中注明抓取日期。
+
+model = "deepseek-flash"
+source = "https://api-docs.deepseek.com/quick_start/pricing"
+fetched = "2026-10-07"
+
+[off_peak]
+cache_hit_input = 0.003
+cache_miss_input = 0.15
+output = 0.60
+
+[peak]
+cache_hit_input = 0.006
+cache_miss_input = 0.30
+output = 1.20
+
+# 高峰时段：UTC，周一至周五，[start, end) 小时。
+[peak_hours]
+weekdays = [0, 1, 2, 3, 4]   # Python weekday()：0 = 周一
+windows = [[1, 4], [6, 10]]
+
+# 中国法定节假日全天按非高峰计。usage.py 不内置节假日日历；
+# 运行期间若有节假日，把日期（UTC，YYYY-MM-DD）填在这里。
+off_peak_dates = []
