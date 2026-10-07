@@ -1,7 +1,7 @@
 # DeepSWE submission: iacoder v0.7.64 + deepseek-flash
 
 One-page summary for Datacurve. Everything below links to files in this repository; after merge the same paths are at
-`https://github.com/infiniact/bench/blob/main/<path>` (directories: `https://github.com/infiniact/bench/tree/main/<path>`).
+`https://github.com/infiniact/iacoder-bench/blob/main/<path>` (directories: `https://github.com/infiniact/iacoder-bench/tree/main/<path>`).
 
 **Status:** ready for submission to Datacurve — not yet on the official DeepSWE leaderboard.
 
@@ -23,7 +23,7 @@ One-page summary for Datacurve. Everything below links to files in this reposito
 | Trials | 452 = 318 pass + 131 fail + 3 excluded (grading error, not resampled) |
 
 Full report: [runs/2026-10-07-deepswe-k4-iacoder-v0.7.64-deepseek-flash/report.md](../runs/2026-10-07-deepswe-k4-iacoder-v0.7.64-deepseek-flash/report.md)
-— <https://github.com/infiniact/bench/blob/main/runs/2026-10-07-deepswe-k4-iacoder-v0.7.64-deepseek-flash/report.md>
+— <https://github.com/infiniact/iacoder-bench/blob/main/runs/2026-10-07-deepswe-k4-iacoder-v0.7.64-deepseek-flash/report.md>
 
 ## Configuration
 
@@ -106,11 +106,11 @@ form Datacurve prefers.
 
 | | Repository path | URL after merge |
 |---|---|---|
-| This page | `docs/deepswe-submission.md` | https://github.com/infiniact/bench/blob/main/docs/deepswe-submission.md |
-| Run archive | `runs/2026-10-07-deepswe-k4-iacoder-v0.7.64-deepseek-flash/` | https://github.com/infiniact/bench/tree/main/runs/2026-10-07-deepswe-k4-iacoder-v0.7.64-deepseek-flash |
-| Report | `…/report.md` | https://github.com/infiniact/bench/blob/main/runs/2026-10-07-deepswe-k4-iacoder-v0.7.64-deepseek-flash/report.md |
-| Score | `…/score.json` | https://github.com/infiniact/bench/blob/main/runs/2026-10-07-deepswe-k4-iacoder-v0.7.64-deepseek-flash/score.json |
-| Binary | `bin/v0.7.64/`, `bin/v0.7.64/SHA256SUMS` | https://github.com/infiniact/bench/tree/main/bin/v0.7.64 |
-| Adapter | `harness/` | https://github.com/infiniact/bench/tree/main/harness |
-| Rules | `RULES.md` | https://github.com/infiniact/bench/blob/main/RULES.md |
-| Scoring | `scoring/` | https://github.com/infiniact/bench/tree/main/scoring |
+| This page | `docs/deepswe-submission.md` | https://github.com/infiniact/iacoder-bench/blob/main/docs/deepswe-submission.md |
+| Run archive | `runs/2026-10-07-deepswe-k4-iacoder-v0.7.64-deepseek-flash/` | https://github.com/infiniact/iacoder-bench/tree/main/runs/2026-10-07-deepswe-k4-iacoder-v0.7.64-deepseek-flash |
+| Report | `…/report.md` | https://github.com/infiniact/iacoder-bench/blob/main/runs/2026-10-07-deepswe-k4-iacoder-v0.7.64-deepseek-flash/report.md |
+| Score | `…/score.json` | https://github.com/infiniact/iacoder-bench/blob/main/runs/2026-10-07-deepswe-k4-iacoder-v0.7.64-deepseek-flash/score.json |
+| Binary | `bin/v0.7.64/`, `bin/v0.7.64/SHA256SUMS` | https://github.com/infiniact/iacoder-bench/tree/main/bin/v0.7.64 |
+| Adapter | `harness/` | https://github.com/infiniact/iacoder-bench/tree/main/harness |
+| Rules | `RULES.md` | https://github.com/infiniact/iacoder-bench/blob/main/RULES.md |
+| Scoring | `scoring/` | https://github.com/infiniact/iacoder-bench/tree/main/scoring |
