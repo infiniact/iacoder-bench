@@ -10,7 +10,6 @@ iacoder 源码仓库不公开，这里放二进制是为了让任何人都能用
 | | | 解包后 `iacoder`（x86_64） | `6dcf86e28ca517d755d24e8dde243829bc0a86a67b0b896932bfe50aa058c065` | |
 | | | `iacoder-aarch64-unknown-linux-musl.tar.gz` | `7a9f42afac2b7d9fdc13e9c661cc113e9ff461c2180b8371ff14d6e5f29c1833` | 无 |
 | | | 解包后 `iacoder`（aarch64） | `50409855be294b66570567faed554943ade4cfca690483efabe8aee90153daeb` | |
-| v0.5.12 | `v0.5.12`（`ae7b7edcaec454462acb153357a602d652dccc30`） | `iacoder`（x86_64，未压缩） | `5613f7351481de10da17e22023c743a800e3789ad05f524dbc15817f21c1ff5f` | 只对应已撤回的结果（见 [docs/withdrawn-2026-10-05.md](../docs/withdrawn-2026-10-05.md)），仅作历史保留 |
 
 ## 校验
 
