@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """统计单个 job 目录中每个 trial 的 token、步数、墙钟时长与成本，输出均值与中位数。
 
-DeepSWE 论文 §6.2 用"每 trial 中位数"，公开榜单表头写的是 AVG，所以两者都给。
+站点榜单口径（主）：DeepSWE v1.1 在线榜单的 Avg cost / Out tok / Steps 是全部计分 attempt 的**均值**，
+成本按**高峰价**（"Costs use the peak rates"），文本输出第一行按站点显示精度给出这三列。
+论文 §6.2 用"每 trial 中位数"，作为补充一并输出。
 
 数据来源：
 - iacoder 的 trial：累加 `agent/session.jsonl` 中 `"kind":"Usage"` 事件。
@@ -23,6 +25,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import statistics
 import sys
 import tomllib
@@ -46,7 +49,8 @@ class Pricing:
         hours = data.get("peak_hours") or {}
         self.weekdays = set(hours.get("weekdays", []))
         self.windows = [tuple(w) for w in hours.get("windows", [])]
-        self.off_dates = set(data.get("off_peak_dates", []))
+        # 顶层键；也接受误写进 [peak_hours] 表里的同名键（TOML 中写在表之后的键属于该表）。
+        self.off_dates = set(data.get("off_peak_dates", [])) | set(hours.get("off_peak_dates", []))
 
     @classmethod
     def load(cls, path: Path | None):
@@ -159,6 +163,29 @@ def usage_job(job: Path, pricing_path: Path | None = None, include_all: bool = F
             "trials": rows}
 
 
+def fmt_cost(v: float | None) -> str:
+    """站点 Avg cost 列：$x.xx；不足 1 美分时保留 1 位有效数字。"""
+    if v is None:
+        return "—"
+    return f"${v:.2f}" if v >= 0.01 else f"${v:.1g}"
+
+
+def fmt_tokens(v: float | None) -> str:
+    """站点 Out tok 列（前端 kt()）：≥1M → x.xM；≥10k → 整数 k；≥1k → 一位小数 k；否则整数。"""
+    if v is None:
+        return "—"
+    if v >= 1e6:
+        return f"{v / 1e6:.1f}M"
+    if v >= 1e3:
+        return f"{v / 1e3:.{0 if v >= 1e4 else 1}f}k"
+    return f"{v:.0f}"
+
+
+def fmt_steps(v: float | None) -> str:
+    """站点 Steps 列：Math.round。"""
+    return "—" if v is None else str(math.floor(v + 0.5))
+
+
 def _fmt(v, kind):
     if v is None:
         return "n/a"
@@ -171,7 +198,10 @@ def _fmt(v, kind):
 
 def format_text(r: dict) -> str:
     s = r["summary"]
-    lines = [f"job: {r['job']}", f"统计范围: {r['scope']}，trial 数 {s['n_trials']}，计价: {r['pricing'] or '无'}",
+    site = (f"【站点榜单口径（主）】均值、成本按高峰价：Avg cost {fmt_cost(s['cost_peak_usd']['mean'])}  "
+            f"Out tok {fmt_tokens(s['output_tokens']['mean'])}  Steps {fmt_steps(s['steps']['mean'])}")
+    lines = [site, "【补充】下表含中位数（论文 §6.2）与按实际时段计价的 cost_usd。",
+             f"job: {r['job']}", f"统计范围: {r['scope']}，trial 数 {s['n_trials']}，计价: {r['pricing'] or '无'}",
              f"{'指标':<22}{'均值':>16}{'中位数':>16}{'有值 trial':>12}"]
     for m in METRICS:
         lines.append(f"{m:<22}{_fmt(s[m]['mean'], m):>16}{_fmt(s[m]['median'], m):>16}{s[m]['n']:>12}")

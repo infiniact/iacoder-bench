@@ -6,7 +6,7 @@ iacoder 源码仓库不公开，这里放二进制是为了让任何人都能用
 
 | 版本 | 来源 tag（commit） | 文件 | SHA256 | 对应的运行 |
 |---|---|---|---|---|
-| v0.7.64 | `v0.7.64`（`24228eac7ae08f11cccc0d6f24028c3bdcd39cdc`） | `iacoder-x86_64-unknown-linux-musl.tar.gz` | `019d16a21513ea1ccbe921c447d6fe728912f43c0bf25b836712fec07430ac2f` | DeepSWE 全量、每题 4 次，进行中，结果未发布 |
+| v0.7.64 | `v0.7.64`（`24228eac7ae08f11cccc0d6f24028c3bdcd39cdc`） | `iacoder-x86_64-unknown-linux-musl.tar.gz` | `019d16a21513ea1ccbe921c447d6fe728912f43c0bf25b836712fec07430ac2f` | [runs/2026-10-07-deepswe-k4-iacoder-v0.7.64-deepseek-flash](../runs/2026-10-07-deepswe-k4-iacoder-v0.7.64-deepseek-flash/)（DeepSWE 113 题 × 4，待提交 Datacurve） |
 | | | 解包后 `iacoder`（x86_64） | `6dcf86e28ca517d755d24e8dde243829bc0a86a67b0b896932bfe50aa058c065` | |
 | | | `iacoder-aarch64-unknown-linux-musl.tar.gz` | `7a9f42afac2b7d9fdc13e9c661cc113e9ff461c2180b8371ff14d6e5f29c1833` | 无 |
 | | | 解包后 `iacoder`（aarch64） | `50409855be294b66570567faed554943ade4cfca690483efabe8aee90153daeb` | |

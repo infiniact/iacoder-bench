@@ -9,6 +9,18 @@ model = "deepseek-flash"
 source = "https://api-docs.deepseek.com/quick_start/pricing"
 fetched = "2026-10-07"
 
+# 中国法定节假日全天按非高峰计。usage.py 不内置节假日日历；
+# 运行期间若有节假日，把日期（UTC，YYYY-MM-DD）填在这里。
+# 注意：必须放在任何 [表] 之前（顶层键）；写在 [peak_hours] 之后会变成 peak_hours.off_peak_dates。
+# 2026 年国庆节：国务院办公厅《关于2026年部分节假日安排的通知》"10月1日（周四）至7日（周三）放假调休，共7天。"
+# （https://www.gov.cn/zhengce/content/202511/content_7047090.htm ，抓取 2026-10-07）
+# 节假日按北京时间（UTC+8）计，这里按 UTC 日期近似：北京时间假期 = 2026-09-30T16:00Z 至 2026-10-07T16:00Z。
+# 因此 2026-09-30 16:00–24:00Z 会被误按平日计、2026-10-07 16:00–24:00Z 会被误按非高峰计；
+# 用到这两个时段的运行需要单独核对。
+off_peak_dates = [
+  "2026-10-01", "2026-10-02", "2026-10-03", "2026-10-04", "2026-10-05", "2026-10-06", "2026-10-07",
+]
+
 [off_peak]
 cache_hit_input = 0.003
 cache_miss_input = 0.15
@@ -23,7 +35,3 @@ output = 1.20
 [peak_hours]
 weekdays = [0, 1, 2, 3, 4]   # Python weekday()：0 = 周一
 windows = [[1, 4], [6, 10]]
-
-# 中国法定节假日全天按非高峰计。usage.py 不内置节假日日历；
-# 运行期间若有节假日，把日期（UTC，YYYY-MM-DD）填在这里。
-off_peak_dates = []

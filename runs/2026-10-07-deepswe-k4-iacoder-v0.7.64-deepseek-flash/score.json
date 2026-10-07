@@ -1,0 +1,1072 @@
+{
+ "job": "<job-dir>",
+ "rules": "deepswe",
+ "min_trials": 4,
+ "expected_tasks": 113,
+ "tasks": 113,
+ "trials": {
+  "pass": 318,
+  "fail": 131,
+  "excluded": 3,
+  "running": 0
+ },
+ "primary_method": "deepswe-site-leaderboard-v1.1",
+ "pass_at_1": 0.7082405345211581,
+ "pass_at_1_macro": 0.7064896755162241,
+ "pass_at_1_pooled": 0.7082405345211581,
+ "n_passed": 318,
+ "n_scored": 449,
+ "se_method": "deepswe 在线榜单 v1.1: 95% run-to-run，1.96·std(s1..sR)/sqrt(R)；每题 trial 按开始时间排序，第 r 次 attempt 为第 r 轮，轮内 pooled",
+ "rounds": [
+  0.7053571428571429,
+  0.7079646017699115,
+  0.6814159292035398,
+  0.7387387387387387
+ ],
+ "round_scored_counts": [
+  112,
+  113,
+  113,
+  111
+ ],
+ "n_rounds": 4,
+ "se": 0.011754516428991491,
+ "ci95_half_width": 0.023038852200823322,
+ "ci95_lo": 0.6852016823203347,
+ "ci95_hi": 0.7312793867219815,
+ "site_display": {
+  "pass_at_1": "71%",
+  "ci95": "±2%"
+ },
+ "pass_at_k": 0.911504424778761,
+ "k": 4,
+ "exception_types": {
+  "VerifierTimeoutError": 3,
+  "AgentTimeoutError": 2
+ },
+ "suspect_infra_trials": 0,
+ "reward_one_with_exception": 1,
+ "sensitivity_pass_at_1_excluding_suspect": 0.7082405345211581,
+ "compliant": true,
+ "problems": [],
+ "problem_details": [],
+ "per_task": [
+  {
+   "task": "abs-module-cache-flags",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "abs-stepped-slices",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "actionlint-action-pinning-lint",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "adaptix-name-mapping-aliases",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "aiomonitor-task-snapshots-diff",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "anko-default-function-arguments",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "anko-typed-variable-bindings",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "arcane-drift-detection-baselines",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "arktype-json-schema-refs-dependencies",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "awilix-async-container-initialization",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "bandit-incremental-cache-control",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "bandit-interprocedural-taint-checks",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "bandit-structured-nosec-directives",
+   "pass": 0,
+   "fail": 4,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.0
+  },
+  {
+   "task": "boa-hierarchical-evaluation-cancellation",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "cattrs-partial-structuring-recovery",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "clack-async-autocomplete-options",
+   "pass": 0,
+   "fail": 4,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.0
+  },
+  {
+   "task": "claude-code-by-agents-recursive-delegation",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "cliffy-config-file-parsing",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "csstree-shorthand-expansion-compression",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "dasel-html-document-format",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "dateutil-rfc5545-timezone-interop",
+   "pass": 1,
+   "fail": 3,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.25
+  },
+  {
+   "task": "drizzle-orm-window-function-builders",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "dynamodb-toolbox-conditional-attribute-requirements",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "dynamodb-toolbox-lazy-recursive-schemas",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "effect-sse-httpapi-streaming",
+   "pass": 0,
+   "fail": 4,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.0
+  },
+  {
+   "task": "eicrud-keyset-pagination-cursor",
+   "pass": 0,
+   "fail": 4,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.0
+  },
+  {
+   "task": "etree-xml-diff-patch",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "expr-try-catch-errors",
+   "pass": 1,
+   "fail": 3,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.25
+  },
+  {
+   "task": "fastapi-deprecation-response-headers",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "fastapi-implicit-head-options",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "fd-deterministic-multi-key-sorting",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "geo-shapeindex-serialization",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "go-critic-doc-link-checker",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "go-genai-streamed-function-args",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "go-git-worktree-merge-conflicts",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "goreleaser-retry-publish-auditing",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "gql-incremental-graphql-delivery",
+   "pass": 0,
+   "fail": 4,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.0
+  },
+  {
+   "task": "happy-dom-abort-pending-body-reads",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "happy-dom-deterministic-intersectionobserver",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "helm-array-merge-strategies",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "helm-unified-manifest-stream",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "httpx-deterministic-cookie-store",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "httpx-multipart-response-parsing",
+   "pass": 1,
+   "fail": 3,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.25
+  },
+  {
+   "task": "httpx-streaming-json-iteration",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "igel-persist-feature-schema",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "ink-grid-box-layout",
+   "pass": 1,
+   "fail": 3,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.25
+  },
+  {
+   "task": "ipython-session-bundle-replay",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "katex-multicolumn-array-spans",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "kcp-go-multiplexed-kcp-streams",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "kea-atomic-signal-selectors",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "kgateway-consistent-hash-policy",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "kombu-single-active-consumer-priority",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "kombu-virtual-queue-dead-lettering",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "koota-composite-trait-aspects",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "koota-deferred-mutation-buffer",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "koota-entity-snapshot-rollback",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "koota-pair-relation-tracking",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "koota-query-predicates",
+   "pass": 1,
+   "fail": 2,
+   "excluded": 1,
+   "running": 0,
+   "scored": 3,
+   "pass_fraction": 0.3333333333333333
+  },
+  {
+   "task": "kysely-window-grouping-helpers",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "langchain-request-coalescing",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "mashumaro-flattened-dataclass-fields",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "meriyah-explicit-resource-declarations",
+   "pass": 0,
+   "fail": 4,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.0
+  },
+  {
+   "task": "mnamer-daemon-watch-lifecycle",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "mobly-grouped-test-barriers",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "narwhals-rolling-window-suite",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "numba-stencil-boundary-modes",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "obsidian-linter-auto-table-of-contents",
+   "pass": 0,
+   "fail": 4,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.0
+  },
+  {
+   "task": "obsidian-linter-link-format-conversion",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "obsidian-linter-scoped-ignore-markers",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "ofetch-per-origin-circuit-breaker",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "onedump-dump-encryption-pipeline",
+   "pass": 1,
+   "fail": 3,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.25
+  },
+  {
+   "task": "opa-rego-rule-profiling",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "opa-template-string-reconstruction",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "optique-conditional-option-dependencies",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "oxvg-structural-selector-preservation",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "participle-grammar-conflict-analysis",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "pebble-durability-wait-apis",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "pest-character-class-coalescing",
+   "pass": 1,
+   "fail": 3,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.25
+  },
+  {
+   "task": "prometheus-transactional-reload-status",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "prometheus-typed-label-sorting",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "psd-tools-blend-range-api",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "pwntools-tube-multiplexing",
+   "pass": 1,
+   "fail": 1,
+   "excluded": 2,
+   "running": 0,
+   "scored": 2,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "python-statemachine-state-data-scoping",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "query-persist-restored-query-state",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "quill-shared-toolbar-focus",
+   "pass": 1,
+   "fail": 3,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.25
+  },
+  {
+   "task": "returns-validated-error-accumulation",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "scc-bounded-memory-spilling",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "scriggo-method-declarations",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "skrub-duration-encoding",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "sql-formatter-bigquery-pipe-formatting",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "sqlfmt-create-table-ddl-formatting",
+   "pass": 0,
+   "fail": 4,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.0
+  },
+  {
+   "task": "sqlite-utils-safe-import-checkpoints",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "superjson-error-stack-serialization",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "task-task-graph-export",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "tengo-callable-instance-isolation",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "tengo-destructuring-bindings",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "termenv-preserve-ansi-resets",
+   "pass": 0,
+   "fail": 4,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.0
+  },
+  {
+   "task": "testem-bail-on-test-failure",
+   "pass": 1,
+   "fail": 3,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.25
+  },
+  {
+   "task": "testem-per-launcher-reports",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "textual-kitty-key-phases",
+   "pass": 0,
+   "fail": 4,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.0
+  },
+  {
+   "task": "textual-richlog-follow-state",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "tomlkit-toml-table-converters",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "true-myth-iterable-collection-combinators",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "ts-pattern-match-each",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "updo-policy-alerting",
+   "pass": 3,
+   "fail": 1,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.75
+  },
+  {
+   "task": "valibot-recursive-schema-composition",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "vitest-duration-sharding",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "vulture-persistent-analysis-cache",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "wasmi-trap-coredumps",
+   "pass": 2,
+   "fail": 2,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 0.5
+  },
+  {
+   "task": "wazero-multi-module-snapshots",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "yaegi-go-embed-directives",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "yjs-map-conflict-detection",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  },
+  {
+   "task": "ytt-jsonpath-query-api",
+   "pass": 4,
+   "fail": 0,
+   "excluded": 0,
+   "running": 0,
+   "scored": 4,
+   "pass_fraction": 1.0
+  }
+ ]
+}

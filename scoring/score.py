@@ -3,15 +3,18 @@
 
 规则依据见仓库根目录 RULES.md。两套口径用 --rules 选择：
 
---rules deepswe（默认）：
-- pass@1 = 各题通过比例（通过次数 / 计分次数）的宏平均，每题权重相同（论文 §5.3）。
-  同时输出 pooled（总通过 / 总计分，在线榜单 v1.1 的口径），两者通常只差零点几个百分点。
-- 不确定性：把每题的计分 trial 按开始时间排序，第 r 次组成第 r 轮，得到 s1..sR；
-  SE = 样本标准差(s1..sR) / sqrt(R)，报告 pass@1 ± 1.96·SE。
+--rules deepswe（默认）：主分数与 ± 采用 DeepSWE v1.1 **在线榜单**口径（leaderboard-live.json 的
+`unit` / `ci_method` / `pass_rate_by_attempt` 字段，见 RULES.md）：
+- pass@1（主）= pooled：通过的计分 attempt / 计分 attempt 总数（"attempt pass rate over scored rollout attempts"）。
+- ±（主）= 95% run-to-run：每题的 trial 按开始时间排序，第 r 次 attempt 组成第 r 轮
+  （榜单的 completed_by_attempt / pass_rate_by_attempt）；第 r 轮分数 s_r = 该轮通过的计分 attempt / 该轮计分 attempt
+  （轮内也是 pooled；被剔除的 attempt 只从该轮分母中去掉，不让后面的 attempt 前移）；
+  ± = 1.96·样本标准差(s1..sR)/sqrt(R)。站点显示为整数百分比：pass@1 四舍五入到 1%，± 为 round(100·half)%。
+- 论文宏平均（补充，论文 §5.3）：各题通过比例的宏平均，每题权重相同；输出在 pass_at_1_macro，不作主分数。
 - pass@k：至少一次通过的题占全部题数的比例（k 取 --min-trials，DeepSWE 为 pass@4）。
 - 剔除（从分子分母同时去掉、不重采样）：只剔除能明确识别的判分错误。
   模型服务错误、瞬态网络错误按规则也可剔除，但 Harbor / Pier 的异常类型无法可靠区分它们，
-  因此**主分数保守地计为失败**，另外单列一个"若剔除全部可疑基础设施异常"的敏感性数值，不作主分数。
+  因此**主分数保守地计为失败**，另外单列一个"若剔除全部可疑基础设施异常"的敏感性数值（pooled），不作主分数。
 - agent 超时、上下文耗尽、agent 非零退出等一律计失败；有异常的 trial 即使 reward=1 也计失败。
 - 合规检查：只接受一个 job 目录；每题已完成次数（计分 + 剔除）>= --min-trials；
   题数 == --expected-tasks；没有仍在运行的 trial；timeout_multiplier 为 1.0 且未覆盖超时与资源；
@@ -152,15 +155,30 @@ def _macro(per_task_scored: dict[str, list[bool]]) -> float | None:
     return sum(fractions) / len(fractions) if fractions else None
 
 
-def round_scores(per_task_scored: dict[str, list[bool]]) -> list[float]:
-    """第 r 轮分数 s_r = 拥有第 r 次计分 trial 的各题在该次的通过率（trial 已按开始时间排序）。"""
-    rounds = max((len(v) for v in per_task_scored.values()), default=0)
-    scores = []
+def round_scores(per_task_attempts: dict[str, list[bool | None]]) -> tuple[list[float], list[int]]:
+    """按 attempt 分轮（在线榜单的 pass_rate_by_attempt）。
+
+    per_task_attempts[task] 是该题按开始时间排好的已结束 attempt：True 通过、False 失败、None 被剔除。
+    第 r 轮 = 各题的第 r 次 attempt；s_r = 该轮通过数 / 该轮计分数（pooled）。返回 (s1..sR, 各轮计分数)。
+    """
+    rounds = max((len(v) for v in per_task_attempts.values()), default=0)
+    scores, counts = [], []
     for r in range(rounds):
-        hits = [v[r] for v in per_task_scored.values() if len(v) > r]
+        hits = [v[r] for v in per_task_attempts.values() if len(v) > r and v[r] is not None]
         if hits:
             scores.append(sum(hits) / len(hits))
-    return scores
+            counts.append(len(hits))
+    return scores, counts
+
+
+def site_pct(x: float | None) -> str:
+    """站点 Pass@1 列：整数百分比（JS toFixed(0)）。"""
+    return "n/a" if x is None else f"{100 * x:.0f}%"
+
+
+def site_ci(half: float | None) -> str:
+    """站点 ± 列：Math.round(half·100)%（半数向上取整）。"""
+    return "n/a" if half is None else f"±{math.floor(100 * half + 0.5):.0f}%"
 
 
 def config_problems(trials: list[Trial]) -> list[str]:
@@ -230,6 +248,7 @@ def score_job(job: Path, min_trials: int, expected_tasks: int | None = None,
         return (t.started_at.replace(tzinfo=None) if t.started_at else far, t.name)
 
     per_task_scored: dict[str, list[bool]] = {}
+    per_task_attempts: dict[str, list[bool | None]] = {}
     per_task_sensitivity: dict[str, list[bool]] = {}
     counts = {"pass": 0, "fail": 0, "excluded": 0, "running": 0}
     errors: dict[str, int] = {}
@@ -251,6 +270,8 @@ def score_job(job: Path, min_trials: int, expected_tasks: int | None = None,
                 reward_one_with_error += 1
         scored = [t.outcome == "pass" for t in ts if t.outcome in ("pass", "fail")]
         per_task_scored[task] = scored
+        per_task_attempts[task] = [(t.outcome == "pass") if t.outcome in ("pass", "fail") else None
+                                   for t in ts if t.outcome != "running"]
         per_task_sensitivity[task] = [t.outcome == "pass" for t in ts
                                       if t.outcome in ("pass", "fail") and not t.suspect_infra]
         attempts = c["pass"] + c["fail"] + c["excluded"]
@@ -266,7 +287,7 @@ def score_job(job: Path, min_trials: int, expected_tasks: int | None = None,
     macro = _macro(per_task_scored)
     n_scored = sum(len(v) for v in per_task_scored.values())
     pooled = sum(sum(v) for v in per_task_scored.values()) / n_scored if n_scored else None
-    rounds = round_scores(per_task_scored)
+    rounds, round_counts = round_scores(per_task_attempts)
     n_tasks = len(tasks)
     if rules == "tbench4":
         pass1 = pooled
@@ -275,13 +296,15 @@ def score_job(job: Path, min_trials: int, expected_tasks: int | None = None,
         pass_k = unbiased_pass_at_k(per_task_scored, min_trials)
         extra_k = {f"pass_at_{k}": unbiased_pass_at_k(per_task_scored, k) for k in (2, 3, 4, 5)}
     else:
-        pass1 = macro
+        pass1 = pooled  # 在线榜单 v1.1：attempt pass rate over scored rollout attempts
         se = statistics.stdev(rounds) / math.sqrt(len(rounds)) if len(rounds) >= 2 else None
-        se_method = "deepswe: std(s1..sR)/sqrt(R)，按开始时间分轮"
+        se_method = ("deepswe 在线榜单 v1.1: 95% run-to-run，1.96·std(s1..sR)/sqrt(R)；"
+                     "每题 trial 按开始时间排序，第 r 次 attempt 为第 r 轮，轮内 pooled")
         solved = sum(1 for v in per_task_scored.values() if any(v))
         pass_k = solved / n_tasks if n_tasks else None
         extra_k = {}
-    sens = _macro(per_task_sensitivity)
+    n_sens = sum(len(v) for v in per_task_sensitivity.values())
+    sens = sum(sum(v) for v in per_task_sensitivity.values()) / n_sens if n_sens else None
 
     problems = []
     if not trials:
@@ -303,14 +326,22 @@ def score_job(job: Path, min_trials: int, expected_tasks: int | None = None,
         "expected_tasks": expected_tasks,
         "tasks": n_tasks,
         "trials": counts,
+        "primary_method": "tbench4-official" if rules == "tbench4" else "deepswe-site-leaderboard-v1.1",
         "pass_at_1": pass1,
         "pass_at_1_macro": macro,
         "pass_at_1_pooled": pooled,
+        "n_passed": sum(sum(v) for v in per_task_scored.values()),
+        "n_scored": n_scored,
         "se_method": se_method,
         "rounds": rounds,
+        "round_scored_counts": round_counts,
         "n_rounds": len(rounds),
         "se": se,
         "ci95_half_width": 1.96 * se if se is not None else None,
+        "ci95_lo": pass1 - 1.96 * se if se is not None and pass1 is not None else None,
+        "ci95_hi": pass1 + 1.96 * se if se is not None and pass1 is not None else None,
+        "site_display": {"pass_at_1": site_pct(pass1),
+                         "ci95": site_ci(1.96 * se if se is not None else None)},
         "pass_at_k": pass_k,
         "k": min_trials,
         **extra_k,
@@ -339,15 +370,18 @@ def format_text(r: dict) -> str:
                   "pass@k（无偏）: " + ", ".join(f"{k[-1]}={pct(r[k])}" for k in
                                                ("pass_at_2", "pass_at_3", "pass_at_4", "pass_at_5"))]
     else:
-        lines += [f"pass@1（{sum(1 for p in r['per_task'] if p['scored'])} 题宏平均）: {pct(r['pass_at_1'])}{ci}"
-                  f"  [pooled {pct(r['pass_at_1_pooled'])}]",
-                  f"按轮分数 s1..sR（R={r['n_rounds']}）: " + ", ".join(pct(s) for s in r["rounds"]),
-                  f"pass@{r['k']}: {pct(r['pass_at_k'])}"]
+        lines += [f"【站点榜单口径（主）】pass@1（pooled，{r['n_passed']}/{r['n_scored']} 个计分 attempt）: "
+                  f"{pct(r['pass_at_1'])}{ci}",
+                  f"  按 attempt 分轮 s1..sR（R={r['n_rounds']}，轮内 pooled，95% run-to-run）: "
+                  + ", ".join(f"{pct(s)}（n={n}）" for s, n in zip(r["rounds"], r["round_scored_counts"])),
+                  f"  站点显示: {r['site_display']['pass_at_1']} {r['site_display']['ci95']}",
+                  f"pass@{r['k']}: {pct(r['pass_at_k'])}",
+                  f"【论文宏平均（补充，论文 §5.3，不作主分数）】pass@1 = {pct(r['pass_at_1_macro'])}"]
     if r["exception_types"]:
         lines.append("异常类型: " + ", ".join(f"{k}={v}" for k, v in r["exception_types"].items()))
     if r["rules"] == "deepswe":
         lines.append(f"敏感性（不作主分数）：剔除 {r['suspect_infra_trials']} 个可疑基础设施异常后 pass@1 = "
-                     f"{pct(r['sensitivity_pass_at_1_excluding_suspect'])}")
+                     f"{pct(r['sensitivity_pass_at_1_excluding_suspect'])}（pooled）")
     if r["reward_one_with_exception"] and r["rules"] == "deepswe":
         lines.append(f"注意：{r['reward_one_with_exception']} 个 trial 带异常但 reward=1，已按失败计")
     if r["compliant"]:

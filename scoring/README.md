@@ -5,7 +5,7 @@
 
 | 文件 | 作用 |
 |---|---|
-| `score.py` | 单个 job 目录的 pass@1（宏平均）、按轮 s1..sR 与 ±1.96·SE、pass@k、剔除、合规检查；不合规退出码 2 |
+| `score.py` | 单个 job 目录的 pass@1（站点榜单口径：pooled，另给论文宏平均）、按轮 s1..sR 与 ±1.96·SE、pass@k、剔除、合规检查；不合规退出码 2 |
 | `usage.py` | 每 trial 的输出 token、步数、墙钟、成本，给均值与中位数 |
 | `leaderboard_row.py` | 输出与 DeepSWE 榜单同列的一行：PASS@1 ±、COST、OUT TOK、STEPS |
 | `pricing/*.toml` | 模型单价（美元 / 百万 token），带来源 URL 与抓取日期 |
@@ -38,9 +38,10 @@ python3 scoring/score.py <job-dir> --rules tbench4 --min-trials 5 --expected-tas
 - **保守计失败**：模型服务错误、瞬态网络错误按规则可以剔除，但从 Harbor / Pier 的异常类型无法可靠区分，
   主分数一律计失败。`AgentTimeoutError`、`ContextLengthExceededError` 以外的其他异常记为"可疑基础设施异常"，
   单独输出"若全部剔除"的敏感性 pass@1，只作参考，不作主分数。
-- **主分数是宏平均**（论文 §5.3）。同时输出 pooled（总通过 / 总计分）：在线榜单 v1.1 的说明写的是
-  "attempt pass rate over scored rollout attempts"，即 pooled。每题次数接近时两者只差零点几个百分点。
-- **按轮**：每题计分 trial 按 `started_at` 排序，第 r 次组成第 r 轮；某题计分次数不足 r 时，第 r 轮只在有数据的题上平均。
+- **主分数与 ± 采用 DeepSWE 站点在线榜单（v1.1）口径**：pass@1 = pooled（通过的计分 attempt / 计分 attempt 总数，
+  "attempt pass rate over scored rollout attempts"）；± = 95% run-to-run，1.96·std(s1..sR)/√R。
+  论文的宏平均（§5.3）作为补充输出在 `pass_at_1_macro`，不作主分数。站点显示精度：pass@1 取整到 1%，± 取整到 1%。
+- **按轮**：每题 trial 按 `started_at` 排序，第 r 次 attempt 组成第 r 轮，轮内 pooled；被剔除的 attempt 只从该轮分母去掉，不让后面的 attempt 前移。
 - **pass@k**：k = `--min-trials`；分母是全部题数（没有计分 trial 的题算未解出）。
 - **合规**：单个 job 目录；每题已完成次数（计分 + 剔除）≥ `--min-trials`；题数等于 `--expected-tasks`；
   没有仍在运行的 trial；`timeout_multiplier == 1.0`，各分项倍率与超时、CPU、内存、存储、GPU 均未覆盖；

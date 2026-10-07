@@ -1,31 +1,40 @@
-# bench
+# Bench
 
-**IACoder**（INFINIACT 的 AI agent 引擎）在 DeepSWE 与 Terminal-Bench 上的评测仓库：
-二进制、评测适配器快照、计分代码、复现步骤与每轮运行档案。
+**English** | [简体中文](README.zh-CN.md)
 
-## 规则摘要
+**Bench** is the evaluation repository for **IACoder**, the AI agent engine developed by
+**INFINIACT CO., LTD.** (hereinafter "**INFINIACT**").
+It currently supports **DeepSWE** and **Terminal-Bench**, and is designed to take on more benchmarks over time.
 
-完整规则、原文与来源见 [RULES.md](RULES.md)（抓取日期 2026-10-07）。
+Everything needed to check a published number lives here: the IACoder binaries, a snapshot of the evaluation harness,
+the scoring code, reproduction steps and the archive of every run.
 
-| | DeepSWE | Terminal-Bench 4.0 |
+## Benchmarks
+
+| Benchmark | Status | Page |
 |---|---|---|
-| 题数 | 113（数据集 commit `0b9fabbb`） | 66，全覆盖，不接受子集 |
-| 每题次数 | 4 | ≥ 5 |
-| 时限 | 以 `task.toml` 为准，倍率 1.0，不覆盖；无步数 / 费用上限 | 统一 8 小时，倍率 1.0，不覆盖超时与资源 |
-| 主指标 | pass@1 宏平均 ± 1.96·SE（按轮）、pass@4 | accuracy（pooled）± 1.96·SE（按题公式） |
-| 出错的 trial | 服务商 / 判分 / 瞬态网络错误剔除，不重采样；超时、上下文耗尽计失败 | 一律记 0，不剔除 |
-| 提交 | 联系 Datacurve | 社区提交目前关闭 |
+| DeepSWE (Datacurve) | **1 publishable result** | [DeepSWE](docs/deepswe/README.md) |
+| Terminal-Bench 4.0 | Internal runs only (community submissions are closed) | [Terminal-Bench](docs/terminal-bench/README.md) |
 
-本仓库附加规定：所有评测关闭网页工具（`--no-web`）；只发布严格合规的结果；不拼接、不取优、不重采样。
+## Published results
 
-## 已发布结果
+| Benchmark | Agent + model | Pass@1 | ± (95%) | Pass@4 | Avg cost | Out tok | Steps | Status |
+|---|---|---|---|---|---|---|---|---|
+| DeepSWE v1.1 | IACoder v0.7.64 + deepseek-flash [max] | **71%** (70.82%) | ±2% (2.30) | 91.2% | $0.454 | 187k | 163 | Ready for submission to Datacurve; not yet on the official leaderboard |
 
-**目前没有符合规则的已发布结果。** 准入条件见 [results/README.md](results/README.md)。
+Scored the way the DeepSWE site leaderboard scores (pooled Pass@1, 95% run-to-run interval, per-attempt means,
+cost at peak rates). Details: [DeepSWE page](docs/deepswe/README.md) ·
+[result file](results/deepswe-v1.1-iacoder-v0.7.64-deepseek-flash-2026-10-07.md) ·
+[run archive](runs/2026-10-07-deepswe-k4-iacoder-v0.7.64-deepseek-flash/).
 
-> 撤回说明（2026-10-05）：此前列出的 DeepSWE「97/117 = 82.9%」已撤下——它由多轮重跑累计得出，不是 pass@1，
-> 且运行时开启了网页搜索。详见 [docs/withdrawn-2026-10-05.md](docs/withdrawn-2026-10-05.md)。
+Only results that follow the organizers' rules are published here — see [RULES.md](RULES.md) and
+[results/README.md](results/README.md). Every evaluation runs with web tools disabled; runs are never merged,
+cherry-picked or resampled.
 
-## 快速开始
+> **Withdrawn (2026-10-05):** the DeepSWE figure "97/117 = 82.9%" listed earlier was accumulated over several reruns,
+> was not pass@1, and ran with web search enabled. See [docs/withdrawn-2026-10-05.md](docs/withdrawn-2026-10-05.md).
+
+## Quick start
 
 ```bash
 ./bench preflight --benchmark deepswe --version v0.7.64 --model deepseek-flash --concurrency 16 --tasks-dir <tasks-dir>
@@ -34,31 +43,34 @@
 ./bench score  <run-id> --leaderboard-row
 ```
 
-Terminal-Bench 4.0 把 `--benchmark deepswe … --tasks-dir <tasks-dir>` 换成 `--benchmark tbench`。
-准备工作（主机、密钥、二进制 URL、镜像）与完整流程见 [docs/quickstart.md](docs/quickstart.md)。
+For Terminal-Bench use `--benchmark tbench`. Host preparation, keys, binary URL and images:
+[docs/quickstart.md](docs/quickstart.md).
 
-## 目录
+## Layout
 
 ```
 bench/
-├── bench, bench.py  # 统一入口：preflight / run / status / score
-├── RULES.md         # 评测组织规则 + 本仓库附加规定 + 变更记录
-├── bin/<version>/   # iacoder 预编译二进制（官方 release，带 SHA256SUMS）
-├── harness/         # iacoder 评测适配器快照（iacoder@v0.7.64，iacoder 源码不公开）
-├── configs/         # 无密钥的 iacoder 评测配置模板
-├── scoring/         # 唯一计分入口 score.py + usage.py + leaderboard_row.py + 单测
-├── runs/            # 每轮运行档案（manifest / score / report）
-├── results/         # 只放合规的对外结果
-├── reproduce/       # 复现环境的通用步骤与工具（镜像缓存、版本锁）
-├── tools/           # 通用分析工具（内部诊断，不进公开成绩）
-├── tests/           # bench 的单测
-└── docs/            # 快速开始、方法论、撤回记录
+├── bench, bench.py  # single entry point: preflight / run / status / score
+├── RULES.md         # organizer rules, this repository's extra rules, change log
+├── bin/<version>/   # IACoder release binaries with SHA256SUMS
+├── harness/         # snapshot of the IACoder evaluation adapters
+├── configs/         # IACoder evaluation config templates (no secrets)
+├── scoring/         # the only scoring entry point (score.py, usage.py, leaderboard_row.py) + tests
+├── runs/            # per-run archives (manifest / score / report / artifacts)
+├── results/         # published, rule-compliant results only
+├── reproduce/       # generic environment setup and tools (image cache, version locks)
+├── tools/           # analysis tools (internal diagnostics, never part of a published score)
+├── tests/           # tests for bench itself
+└── docs/            # per-benchmark pages, quick start, methodology, withdrawal record
 ```
 
-## 测试
+Adding a benchmark: a page under `docs/<benchmark>/` (English and Chinese), its rules in RULES.md, a `--rules`
+mode in `scoring/score.py`, and a harness snapshot.
+
+## Tests
 
 ```bash
 python3 -m unittest discover -s scoring/tests && python3 -m unittest discover -s tests
 ```
 
-© 2026 INFINIACT CO., LTD.  Agent engine: IACoder
+© 2026 INFINIACT CO., LTD. ("INFINIACT"). IACoder is developed by INFINIACT.

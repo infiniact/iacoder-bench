@@ -3,7 +3,7 @@
 每一轮评测运行的档案，一轮一个目录：`runs/<run-id>/`。`./bench run` 自动创建并写 `manifest.json`，
 `./bench score <run-id>` 写 `score.json`。档案只放**小文件**；原始 job 目录（GB 级）不进仓库，用 `artifacts.json` 记录位置与校验和。
 
-本 PR 只提供格式说明和 [`_template/`](_template/)，不含实际轮次。
+格式模板见 [`_template/`](_template/)。
 
 ## 目录格式
 

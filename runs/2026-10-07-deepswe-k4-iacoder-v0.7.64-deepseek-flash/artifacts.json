@@ -1,0 +1,18 @@
+{
+  "job_archive": "not published yet — see report.md; available on request",
+  "job_dir": "<jobs-dir>/2026-10-07__02-54-56 (Pier job directory, unmodified)",
+  "files": 9803,
+  "bytes": 9300866308,
+  "sha256_manifest": {
+    "format": "`find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum` run inside the job directory (GNU coreutils)",
+    "sha256": "ef8341dee4648f129c95b5dfbb80cf353685e2728d374e1fabc56b09da5b1394",
+    "published": false,
+    "note": "The per-file list is kept with the archive; this digest lets anyone verify a copy of the job directory against this run."
+  },
+  "contents": "every trial's result.json, trial.log, config.json, agent/ (session.jsonl, transcript.jsonl, iacoder.txt), verifier/ (test-stdout.txt, reports), artifacts/ (submitted patch)",
+  "secret_scan": {
+    "files_scanned": 9803,
+    "files_with_sk_pattern": 0
+  },
+  "packed_at": null
+}

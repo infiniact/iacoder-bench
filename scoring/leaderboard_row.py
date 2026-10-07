@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
-"""输出与 DeepSWE 公开榜单同列的一行：PASS@1 ±、COST、OUT TOK、STEPS（均值 / 中位数都给）。
+"""输出与 DeepSWE v1.1 在线榜单同列、同显示精度的一行：Pass@1 ±、Avg cost、Out tok、Steps。
 
-在线榜单的 Avg cost / Out tok / Steps 是均值，成本按高峰价计（"Costs use the peak rates"），
-所以 COST 列用 cost_peak_usd；按实际时段计价的成本在 JSON 的 cost_time_of_use_usd 中。
+站点榜单口径（主）：
+- Pass@1 = pooled（通过的计分 attempt / 计分 attempt），整数百分比；± = 95% run-to-run，round(100·half)%。
+- Avg cost / Out tok / Steps = 全部计分 attempt 的**均值**；成本按**高峰价**（"Costs use the peak rates"）。
+- 显示精度照站点前端：成本 $x.xx；token ≥10k 取整 k、1k–10k 一位小数 k、≥1M 一位小数 M；步数取整。
+  例：`71% ±3%  $0.45  187k  163`。
+补充（不进主行）：论文宏平均 pass@1、各项中位数、按实际时段计价的成本，在 md 输出的"补充"行与 JSON 中。
 
-不合规的 job 也会输出，但行首带 NON-COMPLIANT 标记，且退出码为 2；这样的行不得对外发布。
+不合规的 job 也会输出，但带 NON-COMPLIANT 标记，且退出码为 2；这样的行不得对外发布。
 
 用法：
     python3 scoring/leaderboard_row.py <job-dir> --min-trials 4 --expected-tasks 113 \
-        --pricing scoring/pricing/deepseek-flash.toml --label "iacoder v0.7.64 + deepseek-flash" [--format md|tsv|json]
+        --pricing scoring/pricing/deepseek-flash.toml --label "iacoder v0.7.64 + deepseek-flash" [--format md|line|tsv|json]
 """
 from __future__ import annotations
 
@@ -18,26 +22,20 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from score import score_job  # noqa: E402
-from usage import usage_job  # noqa: E402
+from score import score_job, site_ci, site_pct  # noqa: E402
+from usage import fmt_cost, fmt_steps, fmt_tokens, usage_job  # noqa: E402
 
-HEADER = ["AGENT", "PASS@1", "±95%", "PASS@K", "COST peak-rate (mean / median)", "OUT TOK (mean / median)",
-          "STEPS (mean / median)", "COMPLIANT"]
-
-
-def _pair(stat, fmt):
-    m, d = stat["mean"], stat["median"]
-    if m is None:
-        return "n/a"
-    return f"{fmt(m)} / {fmt(d)}"
+HEADER = ["Model", "Pass@1", "±", "Avg cost", "Out tok", "Steps", "PASS@K", "COMPLIANT"]
 
 
 def build_row(score: dict, usage: dict, label: str) -> dict:
     s = usage["summary"]
-    return {
+    half = score["ci95_half_width"]
+    row = {
         "agent": label,
+        "method": score.get("primary_method"),
         "pass_at_1": score["pass_at_1"],
-        "ci95_half_width": score["ci95_half_width"],
+        "ci95_half_width": half,
         "k": score["k"],
         "pass_at_k": score["pass_at_k"],
         "cost_usd": s["cost_peak_usd"],
@@ -45,27 +43,52 @@ def build_row(score: dict, usage: dict, label: str) -> dict:
         "output_tokens": s["output_tokens"],
         "steps": s["steps"],
         "compliant": score["compliant"],
+        "supplementary": {"pass_at_1_macro_paper": score.get("pass_at_1_macro"),
+                          "rounds": score.get("rounds")},
     }
+    row["site_display"] = {
+        "pass_at_1": site_pct(row["pass_at_1"]),
+        "ci95": site_ci(half),
+        "avg_cost": fmt_cost(s["cost_peak_usd"]["mean"]),
+        "out_tok": fmt_tokens(s["output_tokens"]["mean"]),
+        "steps": fmt_steps(s["steps"]["mean"]),
+    }
+    d = row["site_display"]
+    row["site_line"] = f"{d['pass_at_1']} {d['ci95']}  {d['avg_cost']}  {d['out_tok']}  {d['steps']}"
+    return row
+
+
+def supplementary_text(row: dict) -> str:
+    sup = row.get("supplementary") or {}
+    macro = sup.get("pass_at_1_macro_paper")
+    med = lambda key, f: "n/a" if row[key]["median"] is None else f(row[key]["median"])  # noqa: E731
+    tou = row["cost_time_of_use_usd"]["mean"]
+    parts = []
+    if macro is not None:
+        parts.append(f"论文宏平均 pass@1 {100 * macro:.1f}%")
+    parts.append("中位 " + " / ".join([med("cost_usd", lambda v: f"${v:.3f}"),
+                                      med("output_tokens", lambda v: f"{v / 1000:.1f}k"),
+                                      med("steps", lambda v: f"{v:.0f}")]))
+    if tou is not None:
+        parts.append(f"按实际时段计价的成本均值 ${tou:.3f}")
+    return "补充（不作主分数）：" + "；".join(parts)
 
 
 def render(row: dict, fmt: str) -> str:
     if fmt == "json":
         return json.dumps(row, ensure_ascii=False, indent=2)
-    p1 = "n/a" if row["pass_at_1"] is None else f"{100 * row['pass_at_1']:.1f}%"
-    ci = "n/a" if row["ci95_half_width"] is None else f"±{100 * row['ci95_half_width']:.1f}"
+    if fmt == "line":
+        return row["site_line"] + ("" if row["compliant"] else "  NON-COMPLIANT")
+    d = row["site_display"]
     pk = "n/a" if row["pass_at_k"] is None else f"{100 * row['pass_at_k']:.1f}%"
-    cells = [
-        row["agent"], p1, ci, pk,
-        _pair(row["cost_usd"], lambda v: f"${v:.3f}"),
-        _pair(row["output_tokens"], lambda v: f"{v / 1000:.1f}k"),
-        _pair(row["steps"], lambda v: f"{v:.0f}"),
-        "yes" if row["compliant"] else "NON-COMPLIANT",
-    ]
+    cells = [row["agent"], d["pass_at_1"], d["ci95"], d["avg_cost"], d["out_tok"], d["steps"], pk,
+             "yes" if row["compliant"] else "NON-COMPLIANT"]
     header = [h.replace("PASS@K", f"PASS@{row['k']}") for h in HEADER]
     if fmt == "tsv":
         return "\t".join(header) + "\n" + "\t".join(cells)
-    return ("| " + " | ".join(header) + " |\n|" + "---|" * len(header) + "\n| "
-            + " | ".join(cells) + " |")
+    return ("站点榜单口径（主）：Pass@1 pooled、±95% run-to-run、均值、成本按高峰价\n\n"
+            "| " + " | ".join(header) + " |\n|" + "---|" * len(header) + "\n| "
+            + " | ".join(cells) + " |\n\n" + supplementary_text(row))
 
 
 def main(argv=None) -> int:
@@ -76,7 +99,7 @@ def main(argv=None) -> int:
     p.add_argument("--expected-tasks", type=int, default=None)
     p.add_argument("--pricing", type=Path, default=None)
     p.add_argument("--label", default="iacoder")
-    p.add_argument("--format", choices=("md", "tsv", "json"), default="md")
+    p.add_argument("--format", choices=("md", "line", "tsv", "json"), default="md")
     a = p.parse_args(argv)
     score = score_job(a.job, a.min_trials, a.expected_tasks, a.rules)
     usage = usage_job(a.job, a.pricing)

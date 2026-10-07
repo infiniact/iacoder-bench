@@ -704,7 +704,7 @@ def status_text(d: dict) -> str:
              + ("" if d["process_alive"] is None else f"，进程{'存活' if d['process_alive'] else '已退出'}")]
     if d["pass_at_1"] is not None:
         ci = f" ±{100 * d['ci95_half_width']:.1f}" if d["ci95_half_width"] is not None else ""
-        lines.append(f"当前 pass@1 {_p(d['pass_at_1'])}{ci}（未完成，不是成绩）；按轮 "
+        lines.append(f"当前 pass@1 {_p(d['pass_at_1'])}{ci}（站点榜单口径 pooled；未完成，不是成绩）；按轮 "
                      + ", ".join(_p(s) for s in d["rounds"] or []))
     if d["exception_types"]:
         lines.append("异常: " + ", ".join(f"{k}={v}" for k, v in d["exception_types"].items()))
@@ -716,7 +716,7 @@ def status_text(d: dict) -> str:
         lines.append("均值/中位: agent " + mm("agent_wall_s", lambda v: f"{v / 60:.0f}min")
                      + "，步数 " + mm("steps", lambda v: f"{v:.0f}")
                      + "，输出 token " + mm("output_tokens", lambda v: f"{v / 1000:.1f}k")
-                     + "，成本 " + mm("cost_usd", lambda v: f"${v:.3f}"))
+                     + "，成本（高峰价）" + mm("cost_peak_usd", lambda v: f"${v:.3f}"))
     if d["eta_s"] is not None:
         lines.append(f"预计剩余约 {d['eta_s'] / 3600:.1f} 小时（按已结束 trial 的平均时长与并发估算）")
     h = d["host"]

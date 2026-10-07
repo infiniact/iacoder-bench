@@ -1,6 +1,10 @@
 # results/
 
-只放**严格合规**的对外结果。目前为空。
+只放**严格合规**的对外结果。
+
+| 评测 | 配置 | pass@1 | pass@k | 状态 | 文件 |
+|---|---|---|---|---|---|
+| DeepSWE v1.1 | iacoder v0.7.64 + deepseek-flash | 71% ±2%（pooled 70.82% ±2.30） | pass@4 91.2% | 已具备提交条件，**待发送给 Datacurve**（尚未进入官方榜单） | [deepswe-v1.1-iacoder-v0.7.64-deepseek-flash-2026-10-07.md](deepswe-v1.1-iacoder-v0.7.64-deepseek-flash-2026-10-07.md) |
 
 ## 准入条件（全部满足才能放进来）
 
