@@ -6,7 +6,7 @@
 ## 1. 系统与 Docker
 
 - Linux x86_64（二进制另有 aarch64 版）。参考配置：64 vCPU / 121 GiB 内存跑 32 并发时，主机内存实际只用 8–14 GiB。
-- Docker Engine（参考版本 29.x）+ Compose v2，cgroup v2。`/etc/docker/daemon.json` 关键项：
+- Docker Engine（参考版本 29.x）+ Compose v2 + **buildx 插件**，cgroup v2。Ubuntu 的 `docker.io` 包不带 buildx，需另装 `docker-buildx`（各评测主机版本保持一致，参考 0.30.1）；缺它时需要构建出网管控等辅助镜像的题会在建环境阶段失败（`unknown flag: --file`），trial 记 0。`/etc/docker/daemon.json` 关键项：
   ```json
   {
     "default-address-pools": [{"base": "<私有网段A>/16", "size": 24}, {"base": "<私有网段B>/16", "size": 24}],

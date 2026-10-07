@@ -9,7 +9,7 @@ DeepSWE 全部 113 题、每题 4 次；Terminal-Bench 4.0 全部 66 题、每�
 
 按 [reproduce/host-setup.md](../reproduce/host-setup.md) 完成：
 
-1. Docker（daemon.json 地址池、日志）；
+1. Docker（daemon.json 地址池、日志）与 buildx 插件（`docker buildx version` 必须可用）；
 2. runner：DeepSWE 用 `pier`（`datacurve-pier==0.3.1`，按 `reproduce/pier-constraints.txt` 安装），TB4 用 `harbor`；
    不在 PATH 时设 `PIER_BIN` / `HARBOR_BIN` 或传 `--runner-bin`；
 3. 数据集：DeepSWE 克隆 `datacurve-ai/deep-swe` 并 checkout `0b9fabbb…`，`--tasks-dir` 指向其中的 `tasks/`；
@@ -35,7 +35,7 @@ export IACODER_BINARY_URL=http://<docker-bridge-ip>:<port>/iacoder-x86_64-unknow
 | harness | 快照缺文件 | |
 | 配置 | `api_key` 不是 `${ENV:VAR}`；变量未设置；`max_turns` 为正数 | 模型名不在 `[models]` 中 |
 | 数据集 | 题数 ≠ 113 / 66；DeepSWE `task.toml` 超时不统一 | 不是固定的数据集 commit |
-| Docker / runner | daemon 不可用；找不到 runner | runner 版本与锁不一致 |
+| Docker / runner | daemon 不可用；缺 buildx 插件；找不到 runner | runner 版本与锁不一致 |
 | 镜像 | 加 `--require-images` 时缺镜像 | 缺镜像 |
 | 模型端点 | `GET <base_url>/models` 非 2xx 或连不上（只报状态码，不打印密钥） | `--no-endpoint-probe` 跳过 |
 | 资源 | | CPU 限额超过核数、可用内存低、磁盘不足、TB4 无 GPU |

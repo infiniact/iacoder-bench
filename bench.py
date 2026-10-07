@@ -270,6 +270,19 @@ def check_dataset(rep: Report, prof: dict, tasks_dir: Path | None):
         rep.add("OK" if code == 0 else "FAIL", "task.toml 超时", f"[agent] timeout_sec → {out}")
 
 
+BUILDX_HINT = ("缺 docker buildx 插件：Harbor / Pier 用 `docker build --file=…` 构建出网管控等辅助镜像，"
+               "没有 buildx 时环境建不起来、trial 记 0。请先安装（Ubuntu: apt-get install docker-buildx，"
+               "版本与其它评测主机保持一致），本工具不会自动安装")
+
+
+def buildx_status(cp: subprocess.CompletedProcess) -> tuple[str, str]:
+    """`docker buildx version` 的结果 → (级别, 说明)。缺插件是硬性失败：开跑后才暴露会让需要构建辅助镜像的题全部记 0。"""
+    out = (cp.stdout or "").strip()
+    if cp.returncode == 0 and out:
+        return "OK", out.splitlines()[0]
+    return "FAIL", BUILDX_HINT
+
+
 def check_docker_runner(rep: Report, prof: dict, runner_bin: str | None) -> dict:
     info = {}
     cp = sh(["docker", "version", "--format", "{{.Server.Version}}"])
@@ -278,6 +291,9 @@ def check_docker_runner(rep: Report, prof: dict, runner_bin: str | None) -> dict
         rep.add("OK", "Docker", f"server {info['docker']}")
     else:
         rep.add("FAIL", "Docker", "docker daemon 不可用")
+    level, detail = buildx_status(sh(["docker", "buildx", "version"]))
+    info["buildx"] = detail if level == "OK" else None
+    rep.add(level, "Docker buildx", detail)
     exe = runner_bin or os.environ.get(prof["runner_env"]) or shutil.which(prof["runner"])
     if not exe:
         rep.add("FAIL", prof["runner"], f"找不到 {prof['runner']}（设置 {prof['runner_env']} 或加入 PATH）")

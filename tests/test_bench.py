@@ -237,3 +237,27 @@ class TestStatusScore(Base):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class BuildxPreflightTests(unittest.TestCase):
+    """docker buildx 缺失必须在开跑前拦下（2026-10-07：缺插件导致需要构建出网管控镜像的题在建环境阶段记 0）。"""
+
+    def test_present(self):
+        cp = bench.subprocess.CompletedProcess(["docker", "buildx", "version"], 0,
+                                               "github.com/docker/buildx 0.30.1 0.30.1-0ubuntu1\n", "")
+        self.assertEqual(bench.buildx_status(cp), ("OK", "github.com/docker/buildx 0.30.1 0.30.1-0ubuntu1"))
+
+    def test_missing_plugin_is_hard_failure(self):
+        # the exact stderr a docker CLI without the plugin prints
+        cp = bench.subprocess.CompletedProcess(["docker", "buildx", "version"], 1, "",
+                                               "docker: unknown command: docker buildx\n")
+        level, detail = bench.buildx_status(cp)
+        self.assertEqual(level, "FAIL")
+        self.assertIn("docker-buildx", detail)
+        self.assertIn("不会自动安装", detail)
+
+    def test_failed_report_blocks_run(self):
+        level, detail = bench.buildx_status(bench.subprocess.CompletedProcess([], 1, "", "x"))
+        rep = bench.Report()
+        rep.add(level, "Docker buildx", detail)
+        self.assertTrue(rep.failed)
